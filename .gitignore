@@ -1,3 +1,6 @@
+# CMake files
+build/
+
 # Compiled Object files
 *.slo
 *.lo
