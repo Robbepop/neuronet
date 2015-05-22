@@ -11,7 +11,9 @@ namespace nn {
 		m_net{std::addressof(net)},
 		m_kind{kind}
 	{
-		m_neurons.reserve(countNeurons);
+		assert(countNeurons >= 1 &&
+			"there must be a minimum of one neuron in any neural layer.");
+		m_neurons.reserve(countNeurons + 1); // cout bias neuron in
 		while (m_neurons.size() < countNeurons) {
 			m_neurons.emplace_back(*this, Neuron::Kind::normal);
 		}
@@ -20,8 +22,15 @@ namespace nn {
 	}
 
 	void NeuralLayer::initializeConnections() {
-		for (auto& neuron : m_neurons) {
-			neuron.initializeConnections();
+		if (!isOutputLayer())
+			// Connections are always established from the current
+			// neural layer to the next layer. Since the ouput layer
+			// shouldn't have a next layer there are no connections
+			// to initialize.
+		{
+			for (auto& neuron : m_neurons) {
+				neuron.initializeConnections();
+			}
 		}
 	}
 
@@ -66,15 +75,15 @@ namespace nn {
 	}
 
 	void NeuralLayer::feedForward() {
-		std::cout << "NeuralLayer[" << size() << "]::feedForward start\n";
+		//std::cout << "NeuralLayer[" << size() << "]::feedForward start\n";
 		if (!isInputLayer()) {
-			std::cout << "NeuralLayer[" << size() << "]::feedForward no InputLayer start\n";
+			//std::cout << "NeuralLayer[" << size() << "]::feedForward no InputLayer start\n";
 			for (auto& neuron : m_neurons) {
 				neuron.feedForward();
 			}
-			std::cout << "NeuralLayer[" << size() << "]::feedForward no InputLayer end\n";
+			//std::cout << "NeuralLayer[" << size() << "]::feedForward no InputLayer end\n";
 		}
-		std::cout << "NeuralLayer[" << size() << "]::feedForward end\n";
+		//std::cout << "NeuralLayer[" << size() << "]::feedForward end\n";
 	}
 
 	bool NeuralLayer::isInputLayer() const {

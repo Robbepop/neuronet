@@ -54,6 +54,9 @@ namespace nn {
 		// of the latest computation of feedForward and/or backPropagation.
 		auto results() const -> std::vector<double>;
 
+		auto getRecentAverageError() const -> double;
+
+	private:
 		//========================================================
 		// These are helper functions to improve code readability
 		// while accessing the input layer of a neural network.
@@ -68,7 +71,6 @@ namespace nn {
 		auto getOutputLayer()       ->       NeuralLayer &;
 		auto getOutputLayer() const -> const NeuralLayer &;
 
-	private:
 		//========================================================
 		// These private helper functions are used to improve
 		// code readability for the initialization parts to make

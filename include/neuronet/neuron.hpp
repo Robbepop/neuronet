@@ -25,8 +25,8 @@ namespace nn {
 		auto getOutput() const -> double;
 
 		void feedForward();
-		void calcOutputGradients(double targetValue);
-		void calcHiddenGradients();
+		void calculateOutputGradient(double targetValue);
+		void calculateHiddenGradient();
 		void updateInputWeights();
 
 		      NeuralLayer & getLayer();

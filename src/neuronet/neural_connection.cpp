@@ -1,3 +1,4 @@
+#include <cassert>
 #include <memory>
 #include <random>
 
@@ -16,26 +17,19 @@ namespace nn {
 		target.registerIncConnection(*this);
 	}
 
-	void NeuralConnection::setWeight(double value) { m_weight = value; }
+	void NeuralConnection::setWeight(double newWeight) {
+		m_delta_weight = newWeight - m_weight;
+		m_weight = newWeight;
+	}
+
 	auto NeuralConnection::getWeight() const
 		-> double
 	{
 		return m_weight;
 	}
-	auto NeuralConnection::getWeight()
-		-> double &
-	{
-		return m_weight;
-	}
 
-	void NeuralConnection::setDeltaWeight(double value) { m_delta_weight = value; }
 	auto NeuralConnection::getDeltaWeight() const
 		-> double
-	{
-		return m_delta_weight;
-	}
-	auto NeuralConnection::getDeltaWeight()
-		-> double &
 	{
 		return m_delta_weight;
 	}
@@ -43,24 +37,32 @@ namespace nn {
 	auto NeuralConnection::getSource()
 		-> Neuron &
 	{
+		assert(m_source != nullptr &&
+			"source of this connection isn't defined!");
 		return *m_source;
 	}
 
 	auto NeuralConnection::getSource() const
 		-> const Neuron &
 	{
+		assert(m_source != nullptr &&
+			"source of this connection isn't defined!");
 		return *m_source;
 	}
 
 	auto NeuralConnection::getTarget()
 		-> Neuron &
 	{
+		assert(m_source != nullptr &&
+			"target of this connection isn't defined!");
 		return *m_target;
 	}
 
 	auto NeuralConnection::getTarget() const
 		-> const Neuron &
 	{
+		assert(m_source != nullptr &&
+			"target of this connection isn't set!");
 		return *m_target;
 	}
 

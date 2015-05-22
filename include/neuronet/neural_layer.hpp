@@ -53,7 +53,6 @@ namespace nn {
 		//====================================================================
 		// Implementing forward iterator access to internal vector
 		// to enable range based for loop for instances of this class.
-		// Later can be extended with const and reverse iterator accesses.
 		//====================================================================
 		std::vector<Neuron>::iterator               begin()         noexcept;
 		std::vector<Neuron>::const_iterator         begin()   const noexcept;

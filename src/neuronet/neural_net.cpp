@@ -12,6 +12,8 @@ namespace nn {
 		m_recent_avg_error{0.0},
 		m_recent_avg_smoothing_factor{0.0}
 	{
+		assert(neuronsPerLayer.size() >= 2 &&
+			"there need to be a minimum of two layers in a neural network.");
 		m_layers.reserve(neuronsPerLayer.size());
 		for (auto countNeurons : neuronsPerLayer) {
 			const auto layerKind =
@@ -57,13 +59,13 @@ namespace nn {
 		assert(inputValues.size() == getInputLayer().size() - 1 && // bias neuron does not count
 			"inputValues must have the same size as the input layer of this neural network.");
 
-		std::cout << "NeuralNet::feedForward start\n";
+		//std::cout << "NeuralNet::feedForward start\n";
 		setInput(inputValues);
-		std::cout << "NeuralNet::feedForward 1\n";
+		//std::cout << "NeuralNet::feedForward 1\n";
 		for (auto& layer : m_layers) {
 			layer.feedForward();
 		}
-		std::cout << "NeuralNet::feedForward end\n";
+		//std::cout << "NeuralNet::feedForward end\n";
 	}
 
 	void NeuralNet::calculateOverallNetError(
@@ -91,9 +93,11 @@ namespace nn {
 	void NeuralNet::calculateOutputLayerGradients(
 		const std::vector<double> & targetValues
 	) {
+		assert(targetValues.size() == getOutputLayer().size() - 1 && // without bias
+			"there must be equally many target values as neurons in the output layer.");
 		auto neuronIt = getOutputLayer().begin();
 		for (auto value : targetValues) {
-			neuronIt->calcOutputGradients(value);
+			neuronIt->calculateOutputGradient(value);
 			++neuronIt;
 		}
 	}
@@ -102,7 +106,7 @@ namespace nn {
 		for (auto& layer : m_layers) {
 			if (layer.isHiddenLayer()) {
 				for (auto& neuron : layer) {
-					neuron.calcHiddenGradients();
+					neuron.calculateHiddenGradient();
 				}
 			}
 		}
@@ -119,13 +123,19 @@ namespace nn {
 	}
 
 	void NeuralNet::backPropagation(const std::vector<double> & targetValues) {
-		assert(targetValues.size() == getOutputLayer().size() &&
+		assert(targetValues.size() == getOutputLayer().size() - 1 &&
 			"targetValues must have the same size as the output layer of this neural network.");
+		//std::cout << "NeuralNet::backPropagation start\n";
 		calculateOverallNetError(targetValues);
+		//std::cout << "NeuralNet::backPropagation 1\n";
 		calculateAverageError();
+		//std::cout << "NeuralNet::backPropagation 2\n";
 		calculateOutputLayerGradients(targetValues);
+		//std::cout << "NeuralNet::backPropagation 3\n";
 		calculateHiddenLayerGradients();
+		//std::cout << "NeuralNet::backPropagation 4\n";
 		updateConnectionWeights();
+		//std::cout << "NeuralNet::backPropagation end\n";
 	}
 
 	auto NeuralNet::results() const
@@ -137,6 +147,12 @@ namespace nn {
 			result.push_back(neuron.getOutput());
 		}
 		return result;
+	}
+
+	auto NeuralNet::getRecentAverageError() const
+		-> double
+	{
+		return m_recent_avg_error;
 	}
 
 	auto NeuralNet::getInputLayer()

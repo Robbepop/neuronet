@@ -7,25 +7,22 @@
 #include "neuronet/neuron.hpp"
 
 #include "utility/training_data.hpp"
+#include "utility/print_vector.hpp"
 
 int main() {
-	auto data = utility::TrainingData{"../test/test_01.data"};
+	auto data = utility::TrainingData{"../test/test_03.data"};
 	auto net  = nn::NeuralNet{data.getTopology()};
-	std::cout << "Input Topology = ";
-	for (auto&& elem : data.getTopology()) {
-		std::cout << elem << ' ';
-	}   std::cout << '\n';
+	std::cout << "Input Topology = " << data.getTopology() << '\n' << '\n';
+	//auto i = 0ul;
 	for (auto&& pass : data) {
-		std::cout << "InputValues = ";
-		for (auto&& elem : pass.getInputValues()) {
-			std::cout << elem << ' ';
-		}   std::cout << '\n';
-		std::cout << "ExpectedValues = ";
-		for (auto&& elem : pass.getExpectedValues()) {
-			std::cout << elem << ' ';
-		}   std::cout << '\n';
+		//std::cout << "InputValues    = " << pass.getInputValues() << '\n';
+		//std::cout << "ExpectedValues = " << pass.getExpectedValues() << '\n';
 		net.feedForward(pass.getInputValues());
 		net.backPropagation(pass.getExpectedValues());
+		auto results = net.results();
+		//std::cout << "Results        = " << results << '\n';
+		std::cout << "Recent average error = " << net.getRecentAverageError() << "\n\n";
+		//std::cout << "Passes: " << ++i << '\n';
 	}
 
 	return 0;
