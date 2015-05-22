@@ -4,8 +4,8 @@
 #include <vector>
 #include <cstdint>
 
-#include "nn/neural_connection.hpp"
-#include "nn/neural_layer.hpp"
+#include "neuronet/neural_connection.hpp"
+#include "neuronet/neural_layer.hpp"
 
 namespace nn {
 	class NeuralLayer;

@@ -26,6 +26,20 @@ namespace nn {
 		//========================================================
 		explicit NeuralNet(const std::vector<uint64_t> & neurons_per_layer);
 
+		//====================================================================
+		// Rule-of-three
+		// =============
+		// Since NeuralLayer's internal members have pointers and references
+		// to other internal data components custom copy and move operations
+		// are required in order to ensure correct semantics.
+		//====================================================================
+		/*
+		NeuralLayer(const NeuralLayer & other);
+		NeuralLayer(NeuralLayer && other);
+		operator=(const NeuralLayer & rhs);
+		operator=(NeuralLayer && rhs);
+		*/
+
 		// The neural network takes the input values and computes
 		// their values with its current state.
 		// results() can be used to read the result of this

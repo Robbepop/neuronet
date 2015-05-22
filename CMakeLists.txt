@@ -10,14 +10,14 @@ set (CMAKE_CXX_FLAGS "-g -Wall -Wextra -pedantic -std=c++14 -fdiagnostics-color=
 option(USE_CLANG "build application with clang" ON) # OFF is the default
 if (USE_CLANG)
     SET (CMAKE_C_COMPILER             "/usr/bin/clang")
-    SET (CMAKE_C_FLAGS                "-Wall -Wextra -pedantic -std=c99")
+    SET (CMAKE_C_FLAGS                "-Wall -Wextra -pedantic -std=c99 -fdiagnostics-color=auto")
     SET (CMAKE_C_FLAGS_DEBUG          "-g")
     SET (CMAKE_C_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
     SET (CMAKE_C_FLAGS_RELEASE        "-O4 -DNDEBUG")
     SET (CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g")
 
     SET (CMAKE_CXX_COMPILER             "/usr/bin/clang++")
-    SET (CMAKE_CXX_FLAGS                "-Wall -Wextra -pedantic -std=c++14")
+    SET (CMAKE_CXX_FLAGS                "-Wall -Wextra -pedantic -std=c++14 -fdiagnostics-color=auto")
     SET (CMAKE_CXX_FLAGS_DEBUG          "-g")
     SET (CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
     SET (CMAKE_CXX_FLAGS_RELEASE        "-O4 -DNDEBUG")

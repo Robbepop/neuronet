@@ -2,7 +2,7 @@
 #include <cassert>
 #include <iostream>
 
-#include "nn/neural_layer.hpp"
+#include "neuronet/neural_layer.hpp"
 
 namespace nn {
 	NeuralLayer::NeuralLayer(NeuralNet & net, uint64_t countNeurons, NeuralLayer::Kind kind):
@@ -16,11 +16,11 @@ namespace nn {
 			m_neurons.emplace_back(*this, Neuron::Kind::normal);
 		}
 		m_neurons.emplace_back(*this, Neuron::Kind::bias);
-		//std::cout << "NeuralLayer[" << size() << "]::created\n";
+		std::cout << "NeuralLayer[" << size() << "]::created\n";
 	}
 
 	void NeuralLayer::initializeConnections() {
-		for (auto& neuron : neurons()) {
+		for (auto& neuron : m_neurons) {
 			neuron.initializeConnections();
 		}
 	}
@@ -65,24 +65,16 @@ namespace nn {
 		m_next_layer = std::addressof(layer);
 	}
 
-	auto NeuralLayer::neurons()
-		-> std::vector<Neuron> &
-	{
-		return m_neurons;
-	}
-
-	auto NeuralLayer::neurons() const
-		-> const std::vector<Neuron> &
-	{
-		return m_neurons;
-	}
-
 	void NeuralLayer::feedForward() {
+		std::cout << "NeuralLayer[" << size() << "]::feedForward start\n";
 		if (!isInputLayer()) {
-			for (auto& neuron : neurons()) {
+			std::cout << "NeuralLayer[" << size() << "]::feedForward no InputLayer start\n";
+			for (auto& neuron : m_neurons) {
 				neuron.feedForward();
 			}
+			std::cout << "NeuralLayer[" << size() << "]::feedForward no InputLayer end\n";
 		}
+		std::cout << "NeuralLayer[" << size() << "]::feedForward end\n";
 	}
 
 	bool NeuralLayer::isInputLayer() const {
@@ -107,5 +99,81 @@ namespace nn {
 		-> size_t
 	{
 		return m_neurons.size();
+	}
+
+	//=========================================================================
+	// Iterator Wrappers
+	//=======================================================================
+
+	auto NeuralLayer::begin() noexcept
+		-> decltype(m_neurons.begin())
+	{
+		return m_neurons.begin();
+	}
+
+	auto NeuralLayer::begin() const noexcept
+		-> decltype(m_neurons.begin())
+	{
+		return m_neurons.begin();
+	}
+
+	auto NeuralLayer::end() noexcept
+		-> decltype(m_neurons.end())
+	{
+		return m_neurons.end();
+	}
+
+	auto NeuralLayer::end() const noexcept
+		-> decltype(m_neurons.end())
+	{
+		return m_neurons.end();
+	}
+
+	auto NeuralLayer::cbegin() const noexcept
+		-> decltype(m_neurons.cbegin())
+	{
+		return m_neurons.cbegin();
+	}
+
+	auto NeuralLayer::cend() const noexcept
+		-> decltype(m_neurons.cend())
+	{
+		return m_neurons.cend();
+	}
+
+	auto NeuralLayer::rbegin() noexcept
+		-> decltype(m_neurons.rbegin())
+	{
+		return m_neurons.rbegin();
+	}
+
+	auto NeuralLayer::rbegin() const noexcept
+		-> decltype(m_neurons.rbegin())
+	{
+		return m_neurons.rbegin();
+	}
+
+	auto NeuralLayer::rend() noexcept
+		-> decltype(m_neurons.rend())
+	{
+		return m_neurons.rend();
+	}
+
+	auto NeuralLayer::rend() const noexcept
+		-> decltype(m_neurons.rend())
+	{
+		return m_neurons.rend();
+	}
+
+	auto NeuralLayer::crbegin() const noexcept
+		-> decltype(m_neurons.crbegin())
+	{
+		return m_neurons.crbegin();
+	}
+
+	auto NeuralLayer::crend() const noexcept
+		-> decltype(m_neurons.crend())
+	{
+		return m_neurons.crend();
 	}
 }

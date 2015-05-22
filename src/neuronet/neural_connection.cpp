@@ -1,8 +1,8 @@
 #include <memory>
 #include <random>
 
-#include "nn/neuron.hpp"
-#include "nn/neural_connection.hpp"
+#include "neuronet/neuron.hpp"
+#include "neuronet/neural_connection.hpp"
 
 namespace nn {
 	NeuralConnection::NeuralConnection(

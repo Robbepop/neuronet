@@ -1,10 +1,10 @@
 #include <cmath>
-#include <iterator>
 #include <cassert>
 #include <iostream>
 
-#include "nn/neural_net.hpp"
-#include "nn/neural_layer.hpp"
+#include "utility/reverse_adapter.hpp"
+#include "neuronet/neural_net.hpp"
+#include "neuronet/neural_layer.hpp"
 
 namespace nn {
 	NeuralNet::NeuralNet(const std::vector<uint64_t> & neuronsPerLayer):
@@ -46,7 +46,7 @@ namespace nn {
 	}
 
 	void NeuralNet::setInput(const std::vector<double> & inputValues) {
-		auto currentNeuron = getInputLayer().neurons().begin();
+		auto currentNeuron = getInputLayer().begin();
 		for (auto input : inputValues) {
 			currentNeuron->setOutput(input);
 			++currentNeuron;
@@ -54,13 +54,16 @@ namespace nn {
 	}
 
 	void NeuralNet::feedForward(const std::vector<double> & inputValues) {
-		assert(inputValues.size() == getInputLayer().size() &&
+		assert(inputValues.size() == getInputLayer().size() - 1 && // bias neuron does not count
 			"inputValues must have the same size as the input layer of this neural network.");
 
+		std::cout << "NeuralNet::feedForward start\n";
 		setInput(inputValues);
+		std::cout << "NeuralNet::feedForward 1\n";
 		for (auto& layer : m_layers) {
 			layer.feedForward();
 		}
+		std::cout << "NeuralNet::feedForward end\n";
 	}
 
 	void NeuralNet::calculateOverallNetError(
@@ -68,14 +71,14 @@ namespace nn {
 	) {
 		m_error = 0.0;
 		auto targetValuesIt = targetValues.begin();
-		for (auto& neuron : getOutputLayer().neurons()) {
+		for (auto& neuron : getOutputLayer()) {
 			if (neuron.getKind() != Neuron::Kind::bias) {
 				const auto delta = *targetValuesIt - neuron.getOutput();
 				m_error += delta * delta;
 				++targetValuesIt;
 			}
 		}
-		m_error /= getOutputLayer().size() - 1;
+		m_error /= getOutputLayer().size() - 1; // without bias neuron
 		m_error = std::sqrt(m_error);
 	}
 
@@ -88,7 +91,7 @@ namespace nn {
 	void NeuralNet::calculateOutputLayerGradients(
 		const std::vector<double> & targetValues
 	) {
-		auto neuronIt = getOutputLayer().neurons().begin();
+		auto neuronIt = getOutputLayer().begin();
 		for (auto value : targetValues) {
 			neuronIt->calcOutputGradients(value);
 			++neuronIt;
@@ -98,7 +101,7 @@ namespace nn {
 	void NeuralNet::calculateHiddenLayerGradients() {
 		for (auto& layer : m_layers) {
 			if (layer.isHiddenLayer()) {
-				for (auto& neuron : layer.neurons()) {
+				for (auto& neuron : layer) {
 					neuron.calcHiddenGradients();
 				}
 			}
@@ -106,19 +109,9 @@ namespace nn {
 	}
 
 	void NeuralNet::updateConnectionWeights() {
-		/*
-		for (auto& layer : std::make_reverse_iterator(m_layers)) {
+		for (auto& layer : utility::make_reverse(m_layers)) {
 			if (!layer.isInputLayer()) {
-				for (auto& neuron : layer.neurons()) {
-					neuron.updateInputWeights();
-				}
-			}
-		}
-		*/
-		for (auto it = m_layers.rbegin(); it != m_layers.rend(); ++it) {
-			auto& layer = *it;
-			if (!layer.isInputLayer()) {
-				for (auto& neuron : layer.neurons()) {
+				for (auto& neuron : layer) {
 					neuron.updateInputWeights();
 				}
 			}
@@ -140,7 +133,7 @@ namespace nn {
 	{
 		auto result = std::vector<double>{};
 		     result.reserve(getOutputLayer().size());
-		for (auto& neuron : m_layers.back().neurons()) {
+		for (auto& neuron : getOutputLayer()) {
 			result.push_back(neuron.getOutput());
 		}
 		return result;

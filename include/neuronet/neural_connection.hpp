@@ -11,11 +11,12 @@ namespace nn {
 		explicit NeuralConnection(Neuron & source, Neuron & target);
 
 		void setWeight(double value);
-		auto getWeight()       -> double &;
+		auto getWeight()       -> double &; // remove to better check whether input is valid via setter
 		auto getWeight() const -> double;
+	//	auto incWeight() -> double;         // replace getWeight() with this method, why: see above!
 
 		void setDeltaWeight(double value);
-		auto getDeltaWeight()       -> double &;
+		auto getDeltaWeight()       -> double &; // remove to better check whether input is valid via setter
 		auto getDeltaWeight() const -> double;
 
 		      Neuron & getSource();

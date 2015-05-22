@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "nn/neuron.hpp"
+#include "neuronet/neuron.hpp"
 
 namespace nn {
 	Neuron::Neuron(NeuralLayer & layer, Kind kind):
@@ -13,12 +13,12 @@ namespace nn {
 		m_kind{kind},
 		m_layer{std::addressof(layer)}
 	{
-		//std::cout << "Neuron[" << getLayer().size() << "]::created\n";
+		std::cout << "Neuron[" << getLayer().size() << "]::created\n";
 	}
 
 	void Neuron::initializeConnections() {
 		if (!getLayer().isOutputLayer()) {
-			for (auto& neuron : getLayer().nextLayer().neurons()) {
+			for (auto& neuron : getLayer().nextLayer()) {
 				m_connections.emplace_back(*this, neuron);
 			}
 		}
@@ -35,13 +35,21 @@ namespace nn {
 	}
 
 	void Neuron::feedForward() {
-		if (m_kind == Neuron::Kind::normal) {
+		std::cout << "Neuron[" << getLayer().size() << "]::feedForward start\n";
+		if (getKind() == Neuron::Kind::normal) {
+			std::cout << "Neuron[" << getLayer().size() << "]::feedForward isNormal start\n";
 			auto sum = 0.0;
-			for (auto&& connection : m_inc_connections) {
+			std::cout << "Neuron[" << getLayer().size() << "]::feedForward isNormal 1\n";
+			for (auto& connection : m_inc_connections) {
+				std::cout << "Neuron[" << getLayer().size() << "]::feedForward isNormal 2a\n";
 				sum += connection->getSource().getOutput() * connection->getWeight();
+				std::cout << "Neuron[" << getLayer().size() << "]::feedForward isNormal 2b\n";
 			}
+			std::cout << "Neuron[" << getLayer().size() << "]::feedForward isNormal 3\n";
 			m_output = Neuron::transferFunction(sum);
+			std::cout << "Neuron[" << getLayer().size() << "]::feedForward isNormal end\n";
 		}
+		std::cout << "Neuron[" << getLayer().size() << "]::feedForward end\n";
 	}
 
 	void Neuron::calcOutputGradients(double targetValue) {
