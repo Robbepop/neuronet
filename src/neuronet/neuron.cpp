@@ -3,8 +3,6 @@
 #include <cmath>
 #include <algorithm>
 
-#include <iostream>
-
 #include "neuronet/neuron.hpp"
 
 namespace nn {
@@ -22,19 +20,19 @@ namespace nn {
 		return Neuron{nullptr, 1.0};
 	}
 
-	void Neuron::initializeConnections(NeuralLayer & layer) {
+	void Neuron::fullyConnect(NeuralLayer & layer) {
 		m_connections.reserve(layer.size());
 		for (auto& neuron : layer) {
 			m_connections.emplace_back(*this, neuron);
 		}
 	}
 
-	void Neuron::initializeConnections(std::vector<NeuralLayer> & layers) {
+	void Neuron::fullyConnect(std::vector<NeuralLayer> & layers) {
 		auto requiredConnections = 0ul;
 		for (auto& layer : layers) { requiredConnections += layer.size(); }
 		m_connections.reserve(requiredConnections);
 		for (auto& layer : layers) {
-			initializeConnections(layer);
+			fullyConnect(layer);
 		}
 	}
 

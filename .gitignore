@@ -1,8 +1,6 @@
 # CMake files
-build/
-
-# zz_old folder with tutorial indirectives
-zz_old/
+debug/
+release/
 
 # Compiled Object files
 *.slo

@@ -98,7 +98,6 @@ namespace utility {
 		std::ifstream stream{pathToData};
 		auto line   = ""s;
 		std::getline(stream, line);
-		std::cout << line.size() << '\n';
 		m_topology  = parseTopology(line);
 
 		while (std::getline(stream, line)) {

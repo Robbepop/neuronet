@@ -14,11 +14,10 @@
 #include "utility/print_vector.hpp"
 
 int main(int argc, const char ** argv) {
-	assert(argc == 2 && "not enough program parameters given.");
+	if (argc < 2) throw std::runtime_error{"too few parameters passed to program!"};
 	auto data = utility::TrainingData{argv[1]};
 	auto net  = nn::NeuralNet{data.getTopology()};
 	std::cout << "Input Topology = " << data.getTopology() << '\n' << '\n';
-	//auto i = 0ul;
 
 	const auto start = std::chrono::steady_clock::now();
 
@@ -29,7 +28,7 @@ int main(int argc, const char ** argv) {
 		net.backPropagation(pass.getExpectedValues());
 		//auto results = net.results();
 		//std::cout << "Results        = " << results << '\n';
-		std::cout << "Recent average error = " << net.getRecentAverageError() << "\n";
+		//std::cout << "Recent average error = " << net.getRecentAverageError() << "\n";
 		//std::cout << "Passes: " << ++i << '\n';
 	}
 

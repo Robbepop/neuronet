@@ -1,6 +1,5 @@
 #include <cstddef>
 #include <cassert>
-#include <iostream>
 
 #include "neuronet/neural_layer.hpp"
 
@@ -27,7 +26,7 @@ namespace nn {
 			// to initialize.
 		{
 			for (auto& neuron : m_neurons) {
-				neuron.initializeConnections(nextLayer());
+				neuron.fullyConnect(nextLayer());
 			}
 		}
 	}

@@ -15,9 +15,8 @@ namespace nn {
 		Neuron static createOnLayer(NeuralLayer & layer);
 		Neuron static createBias();
 
-		//void initializeConnections();
-		void initializeConnections(NeuralLayer & layer);
-		void initializeConnections(std::vector<NeuralLayer> & layers);
+		void fullyConnect(NeuralLayer & layer);
+		void fullyConnect(std::vector<NeuralLayer> & layers);
 
 		void setOutput(double value);
 		auto getOutput() const -> double;

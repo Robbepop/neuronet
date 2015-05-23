@@ -1,6 +1,5 @@
 #include <cmath>
 #include <cassert>
-#include <iostream>
 
 #include "utility/reverse_adapter.hpp"
 #include "neuronet/neural_net.hpp"
@@ -44,7 +43,7 @@ namespace nn {
 	}
 
 	void NeuralNet::initializeBiasConnection() {
-		m_bias.initializeConnections(m_layers);
+		m_bias.fullyConnect(m_layers);
 	}
 
 	void NeuralNet::initializeLayers() {
