@@ -70,7 +70,7 @@ namespace nn {
 		m_error = 0.0;
 		auto targetValuesIt = targetValues.begin();
 		for (auto& neuron : getOutputLayer()) {
-			if (neuron.getKind() != Neuron::Kind::bias) {
+			if (neuron.getKind() == Neuron::Kind::normal) {
 				const auto delta = *targetValuesIt - neuron.getOutput();
 				m_error += delta * delta;
 				++targetValuesIt;
@@ -99,7 +99,7 @@ namespace nn {
 	}
 
 	void NeuralNet::calculateHiddenLayerGradients() {
-		for (auto& layer : m_layers) {
+		for (auto& layer : utility::make_reverse(m_layers)) {
 			if (layer.isHiddenLayer()) {
 				for (auto& neuron : layer) {
 					neuron.calculateHiddenGradient();

@@ -1,6 +1,7 @@
 #include <cstddef>
 #include <iostream>
 #include <cassert>
+#include <chrono>
 
 #include "neuronet/neural_connection.hpp"
 #include "neuronet/neural_layer.hpp"
@@ -16,6 +17,9 @@ int main(int argc, const char ** argv) {
 	auto net  = nn::NeuralNet{data.getTopology()};
 	std::cout << "Input Topology = " << data.getTopology() << '\n' << '\n';
 	//auto i = 0ul;
+
+	const auto start = std::chrono::steady_clock::now();
+
 	for (auto&& pass : data) {
 		//std::cout << "InputValues    = " << pass.getInputValues() << '\n';
 		//std::cout << "ExpectedValues = " << pass.getExpectedValues() << '\n';
@@ -26,6 +30,11 @@ int main(int argc, const char ** argv) {
 		std::cout << "Recent average error = " << net.getRecentAverageError() << "\n";
 		//std::cout << "Passes: " << ++i << '\n';
 	}
+
+	const auto end = std::chrono::steady_clock::now();
+	const auto diff = end - start;
+	std::cout << "\ttime required: " <<
+		std::chrono::duration<double, std::milli>(diff).count() << '\n';
 
 	return 0;
 }

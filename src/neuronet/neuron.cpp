@@ -1,6 +1,7 @@
 #include <memory>
 #include <cassert>
 #include <cmath>
+#include <algorithm>
 
 #include <iostream>
 
@@ -38,7 +39,7 @@ namespace nn {
 	void Neuron::feedForward() {
 		if (getKind() == Neuron::Kind::normal) {
 			auto sumWeights = 0.0;
-			for (auto& connection : m_inc_connections) {
+			for (auto&& connection : m_inc_connections) { // needs adaption if bias gets removed
 				sumWeights += connection->getSource().getOutput() * connection->getWeight();
 			}
 			m_output = Neuron::transferFunction(sumWeights);
@@ -57,6 +58,7 @@ namespace nn {
 	void Neuron::calculateHiddenGradient() {
 		assert(getLayer().isHiddenLayer() &&
 			"this operation is only defined for neurons within the hidden layer.");
+		if (m_kind == Neuron::Kind::bias) return; // check to see if this calculation is required for bias neurons
 		m_gradient = sumDeltaOutputWeights() * Neuron::transferFunctionDerivate(m_output);
 	}
 
@@ -64,7 +66,7 @@ namespace nn {
 		-> double
 	{
 		auto sum = 0.0;
-		for (auto& connection : m_connections) {
+		for (auto& connection : m_connections) { // no change since bias has no incoming connections!
 			sum += connection.getWeight() * connection.getTarget().m_gradient;
 		}
 		return sum;
@@ -73,7 +75,8 @@ namespace nn {
 	void Neuron::updateInputWeights() {
 		assert(!getLayer().isInputLayer() &&
 			"this operation is not defined for neurons within the input layer.");
-		for (auto& connection : m_inc_connections) {
+		if (m_kind == Neuron::Kind::bias) return;
+		for (auto& connection : m_inc_connections) { // requires to add code if bias gets removed
 			const double newDeltaWeight =
 				// Individual input, megnified by the gradient and train rate
 				eta
@@ -108,7 +111,7 @@ namespace nn {
 		m_inc_connections.push_back(std::addressof(connection));
 	}
 
-	double Neuron::eta   = 0.5;
+	double Neuron::eta   = 0.15;
 	double Neuron::alpha = 0.5;
 
 	auto Neuron::transferFunction(double x)
