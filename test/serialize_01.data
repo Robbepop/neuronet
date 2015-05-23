@@ -1,0 +1,31 @@
+topology 2 3 1
+
+
+neuron 0.812347 0.0012094
+connection  0.012314  0.983121
+connection  3.398129  0.001001
+connection -0.981243  0.984981
+bias 0.0
+
+neuron 1.001881 0.0012332
+connection 13.091240  0.000095
+connection  7.982106 -1.190412
+connection 83.089140  0.919101
+bias 0.0
+
+
+neuron 0.614761 0.1238178
+connection  0.000389 10.910026
+bias 1.109123
+
+neuron 0.991391 0.0001951
+connection  1.001013 -2.914999
+bias 0.091277
+
+neuron 0.718412 0.0192901
+connection -6.098425  5.589213
+bias 0.001013
+
+
+neuron 0.671239 0.8183759
+bias 3.912433
