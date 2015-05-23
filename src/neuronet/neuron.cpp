@@ -12,21 +12,17 @@ namespace nn {
 		m_gradient{0.0},
 		m_kind{kind},
 		m_layer{std::addressof(layer)}
-	{
-		std::cout << "Neuron[" << getLayer().size() << "]::created\n";
-	}
+	{}
 
 	void Neuron::initializeConnections() {
 		assert(!getLayer().isOutputLayer() &&
 			"can't initialize connections of neurons in the output layer!");
-		//if (!getLayer().isOutputLayer()) {
 		m_connections.reserve(getLayer().nextLayer().size() - 1); // without bias
-			for (auto& neuron : getLayer().nextLayer()) {
-				if (neuron.getKind() == Neuron::Kind::normal) {
-					m_connections.emplace_back(*this, neuron);
-				}
+		for (auto& neuron : getLayer().nextLayer()) {
+			if (neuron.getKind() == Neuron::Kind::normal) {
+				m_connections.emplace_back(*this, neuron);
 			}
-		//}
+		}
 	}
 
 	void Neuron::setOutput(double value) {
@@ -40,23 +36,13 @@ namespace nn {
 	}
 
 	void Neuron::feedForward() {
-		//std::cout << "Neuron[" << getLayer().size() << "]::feedForward start\n";
-		//std::cout << "Neuron[" << getLayer().size() <<
-		//	"]::feedForward countIncoming = " << m_inc_connections.size() << '\n';
 		if (getKind() == Neuron::Kind::normal) {
-			//std::cout << "Neuron[" << getLayer().size() << "]::feedForward isNormal start\n";
 			auto sumWeights = 0.0;
-			//std::cout << "Neuron[" << getLayer().size() << "]::feedForward isNormal 1\n";
 			for (auto& connection : m_inc_connections) {
-				//std::cout << "Neuron[" << getLayer().size() << "]::feedForward isNormal 2a\n";
 				sumWeights += connection->getSource().getOutput() * connection->getWeight();
-				//std::cout << "Neuron[" << getLayer().size() << "]::feedForward isNormal 2b\n";
 			}
-			//std::cout << "Neuron[" << getLayer().size() << "]::feedForward isNormal 3\n";
 			m_output = Neuron::transferFunction(sumWeights);
-			//std::cout << "Neuron[" << getLayer().size() << "]::feedForward isNormal end\n";
 		}
-		//std::cout << "Neuron[" << getLayer().size() << "]::feedForward end\n";
 	}
 
 	void Neuron::calculateOutputGradient(double targetValue) {
@@ -73,14 +59,21 @@ namespace nn {
 			"this operation is only defined for neurons within the hidden layer.");
 		m_gradient = sumDeltaOutputWeights() * Neuron::transferFunctionDerivate(m_output);
 	}
+
+	auto Neuron::sumDeltaOutputWeights() const
+		-> double
+	{
+		auto sum = 0.0;
+		for (auto& connection : m_connections) {
+			sum += connection.getWeight() * connection.getTarget().m_gradient;
+		}
+		return sum;
+	}
 	
 	void Neuron::updateInputWeights() {
 		assert(!getLayer().isInputLayer() &&
 			"this operation is not defined for neurons within the input layer.");
-		//std::cout << "Neuron[" << getLayer().size() << "]::updateInputWeights start\n";
 		for (auto& connection : m_inc_connections) {
-			//auto a = connection->getSource().getOutput();
-			//std::cout << "Neuron[" << getLayer().size() << "]::updateInputWeights loop 1\n";
 			const double newDeltaWeight =
 				// Individual input, megnified by the gradient and train rate
 				eta
@@ -89,11 +82,8 @@ namespace nn {
 				// Also add momentum = a fraction of the previous delta weight
 				+ alpha
 				* connection->getDeltaWeight();
-			//std::cout << "Neuron[" << getLayer().size() << "]::updateInputWeights loop 2\n";
 			connection->setWeight(connection->getWeight() + newDeltaWeight);
-			//std::cout << "Neuron[" << getLayer().size() << "]::updateInputWeights loop 3\n";
 		}
-		//std::cout << "Neuron[" << getLayer().size() << "]::updateInputWeights end\n";
 	}
 
 	auto Neuron::getLayer()
@@ -118,7 +108,7 @@ namespace nn {
 		m_inc_connections.push_back(std::addressof(connection));
 	}
 
-	double Neuron::eta   = 0.15;
+	double Neuron::eta   = 0.5;
 	double Neuron::alpha = 0.5;
 
 	auto Neuron::transferFunction(double x)
@@ -131,15 +121,5 @@ namespace nn {
 		-> double
 	{
 		return 1.0 - x * x;
-	}
-
-	auto Neuron::sumDeltaOutputWeights() const
-		-> double
-	{
-		auto sum = 0.0;
-		for (auto& connection : m_connections) {
-			sum += connection.getWeight() * connection.getTarget().m_gradient;
-		}
-		return sum;
 	}
 }

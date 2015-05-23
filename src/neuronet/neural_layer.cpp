@@ -18,7 +18,6 @@ namespace nn {
 			m_neurons.emplace_back(*this, Neuron::Kind::normal);
 		}
 		m_neurons.emplace_back(*this, Neuron::Kind::bias);
-		std::cout << "NeuralLayer[" << size() << "]::created\n";
 	}
 
 	void NeuralLayer::initializeConnections() {
@@ -75,15 +74,11 @@ namespace nn {
 	}
 
 	void NeuralLayer::feedForward() {
-		//std::cout << "NeuralLayer[" << size() << "]::feedForward start\n";
 		if (!isInputLayer()) {
-			//std::cout << "NeuralLayer[" << size() << "]::feedForward no InputLayer start\n";
 			for (auto& neuron : m_neurons) {
 				neuron.feedForward();
 			}
-			//std::cout << "NeuralLayer[" << size() << "]::feedForward no InputLayer end\n";
 		}
-		//std::cout << "NeuralLayer[" << size() << "]::feedForward end\n";
 	}
 
 	bool NeuralLayer::isInputLayer() const {

@@ -58,14 +58,10 @@ namespace nn {
 	void NeuralNet::feedForward(const std::vector<double> & inputValues) {
 		assert(inputValues.size() == getInputLayer().size() - 1 && // bias neuron does not count
 			"inputValues must have the same size as the input layer of this neural network.");
-
-		//std::cout << "NeuralNet::feedForward start\n";
 		setInput(inputValues);
-		//std::cout << "NeuralNet::feedForward 1\n";
 		for (auto& layer : m_layers) {
 			layer.feedForward();
 		}
-		//std::cout << "NeuralNet::feedForward end\n";
 	}
 
 	void NeuralNet::calculateOverallNetError(
@@ -125,17 +121,11 @@ namespace nn {
 	void NeuralNet::backPropagation(const std::vector<double> & targetValues) {
 		assert(targetValues.size() == getOutputLayer().size() - 1 &&
 			"targetValues must have the same size as the output layer of this neural network.");
-		//std::cout << "NeuralNet::backPropagation start\n";
 		calculateOverallNetError(targetValues);
-		//std::cout << "NeuralNet::backPropagation 1\n";
 		calculateAverageError();
-		//std::cout << "NeuralNet::backPropagation 2\n";
 		calculateOutputLayerGradients(targetValues);
-		//std::cout << "NeuralNet::backPropagation 3\n";
 		calculateHiddenLayerGradients();
-		//std::cout << "NeuralNet::backPropagation 4\n";
 		updateConnectionWeights();
-		//std::cout << "NeuralNet::backPropagation end\n";
 	}
 
 	auto NeuralNet::results() const
