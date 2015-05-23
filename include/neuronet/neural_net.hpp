@@ -4,6 +4,8 @@
 #include <vector>
 #include <cstdint>
 
+#include "neuronet/neuron.hpp"
+
 namespace nn {
 	class NeuralLayer;
 
@@ -78,6 +80,7 @@ namespace nn {
 		//========================================================
 		void initializeLayersAdjacency();
 		void initializeLayersConnections();
+		void initializeBiasConnection();
 		void initializeLayers();
 
 		//========================================================
@@ -109,6 +112,7 @@ namespace nn {
 		double m_error;
 		double m_recent_avg_error;
 		double m_recent_avg_smoothing_factor;
+		Neuron m_bias;
 		std::vector<NeuralLayer> m_layers;
 	};
 }

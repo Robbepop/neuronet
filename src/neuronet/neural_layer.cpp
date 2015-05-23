@@ -13,11 +13,10 @@ namespace nn {
 	{
 		assert(countNeurons >= 1 &&
 			"there must be a minimum of one neuron in any neural layer.");
-		m_neurons.reserve(countNeurons + 1); // cout bias neuron in
+		m_neurons.reserve(countNeurons);
 		while (m_neurons.size() < countNeurons) {
-			m_neurons.emplace_back(*this, Neuron::Kind::normal);
+			m_neurons.push_back(Neuron::createOnLayer(*this));
 		}
-		m_neurons.emplace_back(*this, Neuron::Kind::bias);
 	}
 
 	void NeuralLayer::initializeConnections() {
@@ -28,7 +27,7 @@ namespace nn {
 			// to initialize.
 		{
 			for (auto& neuron : m_neurons) {
-				neuron.initializeConnections();
+				neuron.initializeConnections(nextLayer());
 			}
 		}
 	}
@@ -107,7 +106,7 @@ namespace nn {
 
 	//=========================================================================
 	// Iterator Wrappers
-	//=======================================================================
+	//=========================================================================
 
 	auto NeuralLayer::begin() noexcept
 		-> decltype(m_neurons.begin())

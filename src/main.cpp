@@ -3,6 +3,8 @@
 #include <cassert>
 #include <chrono>
 
+#include <vector>
+
 #include "neuronet/neural_connection.hpp"
 #include "neuronet/neural_layer.hpp"
 #include "neuronet/neural_net.hpp"

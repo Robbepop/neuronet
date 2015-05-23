@@ -8,21 +8,33 @@
 #include "neuronet/neuron.hpp"
 
 namespace nn {
-	Neuron::Neuron(NeuralLayer & layer, Kind kind):
-		m_output{kind == Neuron::Kind::bias ? 1.0 : 0.0},
+	Neuron::Neuron(NeuralLayer * layer, double output):
+		m_output{output},
 		m_gradient{0.0},
-		m_kind{kind},
-		m_layer{std::addressof(layer)}
+		m_layer{layer}
 	{}
 
-	void Neuron::initializeConnections() {
-		assert(!getLayer().isOutputLayer() &&
-			"can't initialize connections of neurons in the output layer!");
-		m_connections.reserve(getLayer().nextLayer().size() - 1); // without bias
-		for (auto& neuron : getLayer().nextLayer()) {
-			if (neuron.getKind() == Neuron::Kind::normal) {
-				m_connections.emplace_back(*this, neuron);
-			}
+	Neuron Neuron::createOnLayer(NeuralLayer & layer) {
+		return Neuron{std::addressof(layer), 0.0};
+	}
+
+	Neuron Neuron::createBias() {
+		return Neuron{nullptr, 1.0};
+	}
+
+	void Neuron::initializeConnections(NeuralLayer & layer) {
+		m_connections.reserve(layer.size());
+		for (auto& neuron : layer) {
+			m_connections.emplace_back(*this, neuron);
+		}
+	}
+
+	void Neuron::initializeConnections(std::vector<NeuralLayer> & layers) {
+		auto requiredConnections = 0ul;
+		for (auto& layer : layers) { requiredConnections += layer.size(); }
+		m_connections.reserve(requiredConnections);
+		for (auto& layer : layers) {
+			initializeConnections(layer);
 		}
 	}
 
@@ -37,28 +49,23 @@ namespace nn {
 	}
 
 	void Neuron::feedForward() {
-		if (getKind() == Neuron::Kind::normal) {
-			auto sumWeights = 0.0;
-			for (auto&& connection : m_inc_connections) { // needs adaption if bias gets removed
-				sumWeights += connection->getSource().getOutput() * connection->getWeight();
-			}
-			m_output = Neuron::transferFunction(sumWeights);
+		auto sumWeights = 0.0;
+		for (auto&& connection : m_inc_connections) {
+			sumWeights += connection->getSource().getOutput() * connection->getWeight();
 		}
+		m_output = Neuron::transferFunction(sumWeights);
 	}
 
 	void Neuron::calculateOutputGradient(double targetValue) {
 		assert(getLayer().isOutputLayer() &&
 			"this operation is only defined for neurons within the output layer.");
-		if (m_kind == Neuron::Kind::normal) {
-			const auto delta = targetValue - m_output;
-			m_gradient = delta * Neuron::transferFunctionDerivate(m_output);
-		}
+		const auto delta = targetValue - m_output;
+		m_gradient = delta * Neuron::transferFunctionDerivate(m_output);
 	}
 
 	void Neuron::calculateHiddenGradient() {
 		assert(getLayer().isHiddenLayer() &&
 			"this operation is only defined for neurons within the hidden layer.");
-		if (m_kind == Neuron::Kind::bias) return; // check to see if this calculation is required for bias neurons
 		m_gradient = sumDeltaOutputWeights() * Neuron::transferFunctionDerivate(m_output);
 	}
 
@@ -66,7 +73,7 @@ namespace nn {
 		-> double
 	{
 		auto sum = 0.0;
-		for (auto& connection : m_connections) { // no change since bias has no incoming connections!
+		for (auto& connection : m_connections) {
 			sum += connection.getWeight() * connection.getTarget().m_gradient;
 		}
 		return sum;
@@ -75,8 +82,7 @@ namespace nn {
 	void Neuron::updateInputWeights() {
 		assert(!getLayer().isInputLayer() &&
 			"this operation is not defined for neurons within the input layer.");
-		if (m_kind == Neuron::Kind::bias) return;
-		for (auto& connection : m_inc_connections) { // requires to add code if bias gets removed
+		for (auto& connection : m_inc_connections) {
 			const double newDeltaWeight =
 				// Individual input, megnified by the gradient and train rate
 				eta
@@ -92,19 +98,17 @@ namespace nn {
 	auto Neuron::getLayer()
 		-> NeuralLayer &
 	{
+		assert(m_layer != nullptr &&
+			"this neuron is not placed within a layer; maybe it is a bias neuron?");
 		return *m_layer;
 	}
 
 	auto Neuron::getLayer() const
 		-> const NeuralLayer &
 	{
+		assert(m_layer != nullptr &&
+			"this neuron is not placed within a layer; maybe it is a bias neuron?");
 		return *m_layer;
-	}
-
-	auto Neuron::getKind() const
-		-> Kind
-	{
-		return m_kind;
 	}
 
 	void Neuron::registerIncConnection(NeuralConnection & connection) {

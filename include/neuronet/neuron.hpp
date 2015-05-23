@@ -12,14 +12,12 @@ namespace nn {
 
 	class Neuron {
 	public:
-		enum class Kind {
-			normal,
-			bias
-		};
+		Neuron static createOnLayer(NeuralLayer & layer);
+		Neuron static createBias();
 
-		explicit Neuron(NeuralLayer & layer, Kind kind);
-
-		void initializeConnections();
+		//void initializeConnections();
+		void initializeConnections(NeuralLayer & layer);
+		void initializeConnections(std::vector<NeuralLayer> & layers);
 
 		void setOutput(double value);
 		auto getOutput() const -> double;
@@ -29,14 +27,14 @@ namespace nn {
 		void calculateHiddenGradient();
 		void updateInputWeights();
 
-		      NeuralLayer & getLayer();
-		const NeuralLayer & getLayer() const;
-
-		Kind getKind() const;
-
 		void registerIncConnection(NeuralConnection & connection);
 
 	private:
+		explicit Neuron(NeuralLayer * layer, double output);
+
+		      NeuralLayer & getLayer();
+		const NeuralLayer & getLayer() const;
+
 		static double eta;   // [0 .. 1] overall net training rate
 		static double alpha; // [0 .. n] multiplier of last weight change (momentum)
 
@@ -47,7 +45,6 @@ namespace nn {
 
 		double m_output;
 		double m_gradient;
-		Kind m_kind;
 		NeuralLayer * m_layer;
 		std::vector<NeuralConnection > m_connections;
 		std::vector<NeuralConnection*> m_inc_connections;

@@ -10,7 +10,8 @@ namespace nn {
 	NeuralNet::NeuralNet(const std::vector<uint64_t> & neuronsPerLayer):
 		m_error{0.0},
 		m_recent_avg_error{0.0},
-		m_recent_avg_smoothing_factor{0.0}
+		m_recent_avg_smoothing_factor{0.0},
+		m_bias{Neuron::createBias()}
 	{
 		assert(neuronsPerLayer.size() >= 2 &&
 			"there need to be a minimum of two layers in a neural network.");
@@ -42,12 +43,19 @@ namespace nn {
 		}
 	}
 
+	void NeuralNet::initializeBiasConnection() {
+		m_bias.initializeConnections(m_layers);
+	}
+
 	void NeuralNet::initializeLayers() {
 		initializeLayersAdjacency();
 		initializeLayersConnections();
+		initializeBiasConnection();
 	}
 
 	void NeuralNet::setInput(const std::vector<double> & inputValues) {
+		assert(inputValues.size() == getInputLayer().size() &&
+			"inputValues must have the same size as the input layer of this neural network.");
 		auto currentNeuron = getInputLayer().begin();
 		for (auto input : inputValues) {
 			currentNeuron->setOutput(input);
@@ -56,7 +64,7 @@ namespace nn {
 	}
 
 	void NeuralNet::feedForward(const std::vector<double> & inputValues) {
-		assert(inputValues.size() == getInputLayer().size() - 1 && // bias neuron does not count
+		assert(inputValues.size() == getInputLayer().size() &&
 			"inputValues must have the same size as the input layer of this neural network.");
 		setInput(inputValues);
 		for (auto& layer : m_layers) {
@@ -70,13 +78,11 @@ namespace nn {
 		m_error = 0.0;
 		auto targetValuesIt = targetValues.begin();
 		for (auto& neuron : getOutputLayer()) {
-			if (neuron.getKind() == Neuron::Kind::normal) {
-				const auto delta = *targetValuesIt - neuron.getOutput();
-				m_error += delta * delta;
-				++targetValuesIt;
-			}
+			const auto delta = *targetValuesIt - neuron.getOutput();
+			m_error += delta * delta;
+			++targetValuesIt;
 		}
-		m_error /= getOutputLayer().size() - 1; // without bias neuron
+		m_error /= getOutputLayer().size();
 		m_error = std::sqrt(m_error);
 	}
 
@@ -89,7 +95,7 @@ namespace nn {
 	void NeuralNet::calculateOutputLayerGradients(
 		const std::vector<double> & targetValues
 	) {
-		assert(targetValues.size() == getOutputLayer().size() - 1 && // without bias
+		assert(targetValues.size() == getOutputLayer().size() &&
 			"there must be equally many target values as neurons in the output layer.");
 		auto neuronIt = getOutputLayer().begin();
 		for (auto value : targetValues) {
@@ -119,7 +125,7 @@ namespace nn {
 	}
 
 	void NeuralNet::backPropagation(const std::vector<double> & targetValues) {
-		assert(targetValues.size() == getOutputLayer().size() - 1 &&
+		assert(targetValues.size() == getOutputLayer().size() &&
 			"targetValues must have the same size as the output layer of this neural network.");
 		calculateOverallNetError(targetValues);
 		calculateAverageError();
