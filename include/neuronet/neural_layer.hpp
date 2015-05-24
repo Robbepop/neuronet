@@ -7,7 +7,7 @@
 
 #include "neuronet/neuron.hpp"
 
-namespace nn {
+namespace neuronet {
 	class NeuralNet;
 
 	class NeuralLayer {
@@ -27,14 +27,15 @@ namespace nn {
 		// to other internal data components custom copy and move operations
 		// are required in order to ensure correct semantics.
 		//====================================================================
-		/*
-		NeuralLayer(const NeuralLayer & other);
-		NeuralLayer(NeuralLayer && other);
-		operator=(const NeuralLayer & rhs);
-		operator=(NeuralLayer && rhs);
-		*/
+		///*
+		//NeuralLayer(const NeuralLayer & other);
+		//NeuralLayer(NeuralLayer && other);
+		//operator=(const NeuralLayer & rhs);
+		//NeuralLayer & operator=(NeuralLayer && rhs);
+		//*/
 
 		void initializeConnections();
+		void initializeBackConnections();
 
 		      NeuralLayer & nextLayer();
 		const NeuralLayer & nextLayer() const;

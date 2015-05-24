@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-namespace nn {
+namespace neuronet {
 	class Neuron;
 
 	class NeuralConnection {
@@ -16,7 +16,6 @@ namespace nn {
 
 		      Neuron & getSource();
 		const Neuron & getSource() const;
-
 		      Neuron & getTarget();
 		const Neuron & getTarget() const;
 

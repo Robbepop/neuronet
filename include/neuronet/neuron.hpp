@@ -7,7 +7,7 @@
 #include "neuronet/neural_connection.hpp"
 #include "neuronet/neural_layer.hpp"
 
-namespace nn {
+namespace neuronet {
 	class NeuralLayer;
 
 	class Neuron {
@@ -15,8 +15,12 @@ namespace nn {
 		Neuron static createOnLayer(NeuralLayer & layer);
 		Neuron static createBias();
 
+		Neuron(Neuron && other) = default;
+		Neuron & operator=(Neuron && rhs) = default;
+
 		void fullyConnect(NeuralLayer & layer);
-		void fullyConnect(std::vector<NeuralLayer> & layers);
+		//void fullyConnect(std::vector<NeuralLayer> & layers);
+		void initializeBackConnections();
 
 		void setOutput(double value);
 		auto getOutput() const -> double;

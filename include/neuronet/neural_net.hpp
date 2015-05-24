@@ -6,7 +6,7 @@
 
 #include "neuronet/neuron.hpp"
 
-namespace nn {
+namespace neuronet {
 	class NeuralLayer;
 
 	//========================================================
@@ -35,12 +35,12 @@ namespace nn {
 		// to other internal data components custom copy and move operations
 		// are required in order to ensure correct semantics.
 		//====================================================================
-		/*
-		NeuralLayer(const NeuralLayer & other);
-		NeuralLayer(NeuralLayer && other);
-		operator=(const NeuralLayer & rhs);
-		operator=(NeuralLayer && rhs);
-		*/
+		///*
+		//NeuralNet(const NeuralNet & other);
+		//NeuralNet(NeuralNet && other);
+		//NeuralNet & operator=(const NeuralNet & rhs);
+		//NeuralNet & operator=(NeuralNet && rhs);
+		//*/
 
 		// The neural network takes the input values and computes
 		// their values with its current state.
@@ -81,6 +81,7 @@ namespace nn {
 		void initializeLayersAdjacency();
 		void initializeLayersConnections();
 		void initializeBiasConnection();
+		void initializeBackConnections();
 		void initializeLayers();
 
 		//========================================================

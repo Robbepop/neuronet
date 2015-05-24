@@ -2,10 +2,12 @@
 #include <cassert>
 
 #include "utility/reverse_adapter.hpp"
+#include "utility/zip_range.hpp"
+
 #include "neuronet/neural_net.hpp"
 #include "neuronet/neural_layer.hpp"
 
-namespace nn {
+namespace neuronet {
 	NeuralNet::NeuralNet(const std::vector<uint64_t> & neuronsPerLayer):
 		m_error{0.0},
 		m_recent_avg_error{0.0},
@@ -43,22 +45,37 @@ namespace nn {
 	}
 
 	void NeuralNet::initializeBiasConnection() {
-		m_bias.fullyConnect(m_layers);
+		for (auto& layer : m_layers) {
+			m_bias.fullyConnect(layer);
+		}
+	}
+
+	void NeuralNet::initializeBackConnections() {
+		for (auto& layer : m_layers) {
+			layer.initializeBackConnections();
+		}
+		m_bias.initializeBackConnections();
 	}
 
 	void NeuralNet::initializeLayers() {
 		initializeLayersAdjacency();
 		initializeLayersConnections();
 		initializeBiasConnection();
+		initializeBackConnections();
 	}
 
 	void NeuralNet::setInput(const std::vector<double> & inputValues) {
 		assert(inputValues.size() == getInputLayer().size() &&
 			"inputValues must have the same size as the input layer of this neural network.");
-		auto currentNeuron = getInputLayer().begin();
-		for (auto input : inputValues) {
-			currentNeuron->setOutput(input);
-			++currentNeuron;
+		/*
+		auto inputIt = inputValues.begin();
+		for (auto& neuron : getInputLayer()) {
+			neuron.setOutput(*inputIt);
+			++inputIt;
+		}
+		*/
+		for (auto&& zipped : utility::zip_range(getInputLayer(), inputValues)) {
+			zipped.get<0>().setOutput(zipped.get<1>());
 		}
 	}
 
@@ -74,12 +91,20 @@ namespace nn {
 	void NeuralNet::calculateOverallNetError(
 		const std::vector<double> & targetValues
 	) {
+		assert(targetValues.size() == getOutputLayer().size() &&
+			"there must be equally many target values as neurons in the output layer.");
 		m_error = 0.0;
+		/*
 		auto targetValuesIt = targetValues.begin();
 		for (auto& neuron : getOutputLayer()) {
 			const auto delta = *targetValuesIt - neuron.getOutput();
 			m_error += delta * delta;
 			++targetValuesIt;
+		}
+		*/
+		for (auto&& zipped : utility::zip_range(getOutputLayer(), targetValues)) {
+			const auto delta = zipped.get<1>() - zipped.get<0>().getOutput();
+			m_error += delta * delta;
 		}
 		m_error /= getOutputLayer().size();
 		m_error = std::sqrt(m_error);
@@ -96,10 +121,8 @@ namespace nn {
 	) {
 		assert(targetValues.size() == getOutputLayer().size() &&
 			"there must be equally many target values as neurons in the output layer.");
-		auto neuronIt = getOutputLayer().begin();
-		for (auto value : targetValues) {
-			neuronIt->calculateOutputGradient(value);
-			++neuronIt;
+		for (auto&& zipped : utility::zip_range(getOutputLayer(), targetValues)) {
+			zipped.get<0>().calculateOutputGradient(zipped.get<1>());
 		}
 	}
 

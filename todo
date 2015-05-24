@@ -1,6 +1,7 @@
 TODO Liste:
 
 - make NeuralNet, NeuralLayer, NeuralConnection and Neuron copyable and movable.
-- remove bias neuron and handle bias values within the neuron itself for every neuron.
 - make NeuralNets serializable to output them to a stream and construct them via a stream.
 - make execution of feedForward and backPropagation paralellized.
+- remove Neuron's reference to its NeuralLayer as it isn't really required. (more cache efficiency!)
+- add some helper methods to forward execution from NeuralNet to NeuralLayer.

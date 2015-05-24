@@ -5,7 +5,7 @@
 
 #include "neuronet/neuron.hpp"
 
-namespace nn {
+namespace neuronet {
 	Neuron::Neuron(NeuralLayer * layer, double output):
 		m_output{output},
 		m_gradient{0.0},
@@ -27,12 +27,9 @@ namespace nn {
 		}
 	}
 
-	void Neuron::fullyConnect(std::vector<NeuralLayer> & layers) {
-		auto requiredConnections = 0ul;
-		for (auto& layer : layers) { requiredConnections += layer.size(); }
-		m_connections.reserve(requiredConnections);
-		for (auto& layer : layers) {
-			fullyConnect(layer);
+	void Neuron::initializeBackConnections() {
+		for (auto&& connection : m_connections) {
+			connection.getTarget().registerIncConnection(connection);
 		}
 	}
 

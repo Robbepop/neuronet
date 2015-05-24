@@ -5,7 +5,7 @@
 #include "neuronet/neuron.hpp"
 #include "neuronet/neural_connection.hpp"
 
-namespace nn {
+namespace neuronet {
 	NeuralConnection::NeuralConnection(
 		Neuron & source, Neuron & target
 	):
@@ -13,9 +13,7 @@ namespace nn {
 		m_delta_weight{0.0},
 		m_source{std::addressof(source)},
 		m_target{std::addressof(target)}
-	{
-		target.registerIncConnection(*this);
-	}
+	{}
 
 	void NeuralConnection::setWeight(double newWeight) {
 		m_delta_weight = newWeight - m_weight;
@@ -54,7 +52,7 @@ namespace nn {
 		-> Neuron &
 	{
 		assert(m_source != nullptr &&
-			"target of this connection isn't defined!");
+			"target of this connection isn't set!");
 		return *m_target;
 	}
 

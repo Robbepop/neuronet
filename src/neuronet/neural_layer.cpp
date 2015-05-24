@@ -3,7 +3,7 @@
 
 #include "neuronet/neural_layer.hpp"
 
-namespace nn {
+namespace neuronet {
 	NeuralLayer::NeuralLayer(NeuralNet & net, uint64_t countNeurons, NeuralLayer::Kind kind):
 		m_prev_layer{nullptr},
 		m_next_layer{nullptr},
@@ -27,6 +27,14 @@ namespace nn {
 		{
 			for (auto& neuron : m_neurons) {
 				neuron.fullyConnect(nextLayer());
+			}
+		}
+	}
+
+	void NeuralLayer::initializeBackConnections() {
+		if (!isOutputLayer()) {
+			for (auto& neuron : m_neurons) {
+				neuron.initializeBackConnections();
 			}
 		}
 	}
